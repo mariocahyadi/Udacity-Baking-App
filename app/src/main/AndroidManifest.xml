@@ -25,7 +25,9 @@
 
         <provider
             android:name=".provider.RecipeProvider"
-            android:authorities="com.mario99ukdw.bakingapp.provider" />
+            android:authorities="com.mario99ukdw.bakingapp.provider"
+            android:exported="true"
+            />
 
         <activity
             android:name=".DetailActivity"
