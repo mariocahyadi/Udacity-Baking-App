@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Baking App</string>
+
+    <string name="ingredient">Ingredient</string>
+    <string name="ingredients">Ingredients</string>
+
+    <string name="text_no_data_to_show">Sorry, no data to show at the moment.</string>
+    <string name="text_placeholder_name">Name text</string>
+    <string name="text_placeholder_description">Description</string>
+    <string name="text_step_number">Step %1$d</string>
+    <string name="text_step_intro">Intro</string>
+    <string name="text_no_video">There is no video to show</string>
+    <string name="text_select_recipe_for_widget">Select recipe to show on the widget</string>
+
+    <string name="action_previous">Previous</string>
+    <string name="action_next">Next</string>
+
+    <string name="message_please_wait">Please wait</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="desc_no_data_to_show">Sorry, no data to show at the moment.</string>
+    <string name="desc_ingredients">Recipe ingredients</string>
+    <string name="desc_recipe_list">Recipe list</string>
+    <string name="desc_recipe_name">Recipe name</string>
+    <string name="desc_recipe_description">Recipe description</string>
+    <string name="desc_recipe_image">Recipe image</string>
+    <string name="desc_step_list">Steps list</string>
+    <string name="desc_step_item">Recipe step</string>
+    <string name="desc_step_description">Step description</string>
+    <string name="desc_step_number">Step number</string>
+    <string name="desc_no_video">There is no video to show</string>
+    <string name="desc_media_player">Player for playing video</string>
+
+    <string name="toast_no_connectivity">Cannot connect to internet, please check connection and then swipe down to refresh</string>
+    <string name="toast_load_data_from_server_failed">Failed to load recipes from server</string>
+
+</resources>

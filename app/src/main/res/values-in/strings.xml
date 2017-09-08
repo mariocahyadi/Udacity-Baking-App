@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Resep Masakan</string>
+
+    <string name="ingredient">Bahan</string>
+    <string name="ingredients">Bahan-bahan</string>
+
+    <string name="text_no_data_to_show">Maaf, tidak ada untuk ditampilkan saat ini.</string>
+    <string name="text_placeholder_name">Teks nama</string>
+    <string name="text_placeholder_description">Keterangan</string>
+    <string name="text_step_number">Langkah %1$d</string>
+    <string name="text_step_intro">Intro</string>
+    <string name="text_no_video">Tidak ada video untuk ditampilkan</string>
+    <string name="text_select_recipe_for_widget">Pilih resep yang akan ditampilkan di widget</string>
+
+    <string name="action_previous">Sebelum</string>
+    <string name="action_next">Lanjut</string>
+
+    <string name="message_please_wait">Mohon ditunggu</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="desc_no_data_to_show">Maaf, tidak ada untuk ditampilkan saat ini.</string>
+    <string name="desc_ingredients">Bahan-bahan masakan</string>
+    <string name="desc_recipe_list">Daftar resep makanan</string>
+    <string name="desc_recipe_name">Name resep makanan</string>
+    <string name="desc_recipe_description">Keterangan resep makanan</string>
+    <string name="desc_recipe_image">Gambar resep makanan</string>
+    <string name="desc_step_list">Daftar langkah-langkah</string>
+    <string name="desc_step_item">Langkah-langkah</string>
+    <string name="desc_step_description">Keterangan langkah resep</string>
+    <string name="desc_step_number">Nomor langkah</string>
+    <string name="desc_no_video">Tidak ada video untuk ditampilkan</string>
+    <string name="desc_media_player">Player untuk memainkan video</string>
+
+    <string name="toast_no_connectivity">Tidak bisa mengakses internet, mohon cek koneksi internet kemudian refresh kembali</string>
+    <string name="toast_load_data_from_server_failed">Gagal mengunduh data resep makanan dari server</string>
+
+</resources>
