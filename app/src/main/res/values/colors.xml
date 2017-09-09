@@ -6,4 +6,5 @@
     <color name="colorButtonPressed">#64DD17</color>
     <color name="colorVideoBackground">#000000</color>
     <color name="colorWidgetBackground">#000000</color>
+    <color name="colorWidgetText">#FFFFFF</color>
 </resources>

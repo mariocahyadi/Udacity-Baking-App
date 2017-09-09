@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -16,12 +17,19 @@ import com.mario99ukdw.bakingapp.DetailActivity;
 import com.mario99ukdw.bakingapp.R;
 import com.mario99ukdw.bakingapp.provider.RecipeContract;
 import com.mario99ukdw.bakingapp.provider.RecipeProvider;
+import com.mario99ukdw.bakingapp.schema.json.Ingredient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class RecipeWidget extends AppWidgetProvider {
     private static final String LOG_TAG = RecipeWidget.class.getSimpleName();
+
+    public static final String EXTRA_VAR_NAME = "recipe.data";
+    public static final String EXTRA_INGREDIENTS = "ingredients";
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
@@ -35,10 +43,36 @@ public class RecipeWidget extends AppWidgetProvider {
 
         views.setTextViewText(R.id.recipe_name_text_view, recipeName);
 
-        Intent adapter = new Intent(context, RecipeWidgetService.class);
-        adapter.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        adapter.setData(Uri.fromParts("content", String.valueOf(appWidgetId), null)); // https://stackoverflow.com/questions/11350287/ongetviewfactory-only-called-once-for-multiple-widgets
-        views.setRemoteAdapter(R.id.ingredient_list_view, adapter);
+        // Load ingredients
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        String[] projection = new String[]{
+                RecipeContract.IngredientsColumn.COL_QUANTITY, // 0
+                RecipeContract.IngredientsColumn.COL_MEASURE, // 1
+                RecipeContract.IngredientsColumn.COL_INGREDIENT, // 2
+        };
+        Cursor cursor = context.getContentResolver().query(RecipeProvider.getIngredientContentUri(recipeId), projection, null, null, null);
+        if (cursor.getCount() > 0) {
+            while(cursor.moveToNext()) {
+                Ingredient ingredient = new Ingredient();
+                ingredient.setQuantity(cursor.getDouble(0));
+                ingredient.setMeasure(cursor.getString(1));
+                ingredient.setIngredient(cursor.getString(2));
+                ingredients.add(ingredient);
+            }
+        }
+        cursor.close();
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(EXTRA_INGREDIENTS, ingredients);
+        bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+
+        Intent intent = new Intent(context, RecipeWidgetService.class);
+
+        intent.putExtra(EXTRA_VAR_NAME, bundle);
+        //intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        //intent.putParcelableArrayListExtra(EXTRA_INGREDIENTS, ingredients);
+        intent.setData(Uri.fromParts("content", String.valueOf(appWidgetId), null)); // https://stackoverflow.com/questions/11350287/ongetviewfactory-only-called-once-for-multiple-widgets
+        views.setRemoteAdapter(R.id.ingredient_list_view, intent);
 
 //        Intent startActivityIntent = new Intent(context, DetailActivity.class);
 //        PendingIntent startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);

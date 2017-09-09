@@ -10,5 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:contentDescription="@string/desc_recipe_name"
+        android:textColor="@color/colorWidgetText"
         tools:text="@string/text_placeholder_description" />
 </LinearLayout>

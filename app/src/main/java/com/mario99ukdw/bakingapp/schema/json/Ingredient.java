@@ -1,13 +1,17 @@
 
 package com.mario99ukdw.bakingapp.schema.json;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-public class Ingredient {
+public class Ingredient implements Parcelable {
+    public Ingredient() {}
 
     @SerializedName("quantity")
     @Expose
@@ -59,4 +63,34 @@ public class Ingredient {
         NumberFormat nf = new DecimalFormat("##.#");
         return String.format("%s %s %s", nf.format(quantity), getMeasureText(measure), ingredient);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(quantity);
+        dest.writeString(measure);
+        dest.writeString(ingredient);
+    }
+
+    private Ingredient(Parcel in){
+        this.quantity = in.readDouble();
+        this.measure = in.readString();
+        this.ingredient = in.readString();
+    }
+    public static final Parcelable.Creator<Ingredient> CREATOR = new Parcelable.Creator<Ingredient>() {
+
+        @Override
+        public Ingredient createFromParcel(Parcel source) {
+            return new Ingredient(source);
+        }
+
+        @Override
+        public Ingredient[] newArray(int size) {
+            return new Ingredient[size];
+        }
+    };
 }

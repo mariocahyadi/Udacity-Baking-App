@@ -18,6 +18,9 @@ import com.mario99ukdw.bakingapp.provider.RecipeProvider;
 import com.mario99ukdw.bakingapp.schema.json.Ingredient;
 import com.mario99ukdw.bakingapp.schema.json.Recipe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by mario99ukdw on 07.09.2017.
  */
@@ -26,12 +29,15 @@ public class IngredientListFactory implements RemoteViewsService.RemoteViewsFact
     private final static String LOG_TAG = IngredientListFactory.class.getSimpleName();
 
     private Context context;
-    private Cursor cursor;
     private int appWidgetId;
+    private ArrayList<Ingredient> ingredients = new ArrayList<>();
 
     public IngredientListFactory(Context context, Intent intent) {
         this.context = context;
-        appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        Bundle bundle = intent.getBundleExtra(RecipeWidget.EXTRA_VAR_NAME);
+
+        appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        ingredients = bundle.getParcelableArrayList(RecipeWidget.EXTRA_INGREDIENTS);
         Log.d(LOG_TAG, "Constructor " + appWidgetId);
     }
 
@@ -45,42 +51,24 @@ public class IngredientListFactory implements RemoteViewsService.RemoteViewsFact
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int recipeId = prefs.getInt("widget_recipe_id_" + appWidgetId, 0);
         Log.d(LOG_TAG, "widgetId : " + appWidgetId + ", recipeId:" + recipeId);
-
-        if (cursor != null) {
-            cursor.close();
-        }
-        String[] projection = new String[]{
-                RecipeContract.IngredientsColumn.COL_QUANTITY, // 0
-                RecipeContract.IngredientsColumn.COL_MEASURE, // 1
-                RecipeContract.IngredientsColumn.COL_INGREDIENT, // 2
-        };
-        cursor = context.getContentResolver().query(RecipeProvider.getIngredientContentUri(recipeId), projection, null, null, null);
-        Log.d(LOG_TAG, "Total : " + cursor.getCount());
     }
 
     @Override
     public void onDestroy() {
-        if (cursor != null) {
-            cursor.close();
-        }
+
     }
 
     @Override
     public int getCount() {
-        return cursor.getCount();
+        return ingredients.size();
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.list_item_ingredient_widget);
-        if (cursor.moveToPosition(position)) {
-            Ingredient ingredient = new Ingredient();
-            ingredient.setQuantity(cursor.getDouble(0));
-            ingredient.setMeasure(cursor.getString(1));
-            ingredient.setIngredient(cursor.getString(2));
+        Ingredient ingredient = ingredients.get(position);
 
-            rv.setTextViewText(R.id.ingredient_text_view, ingredient.getFormatedText());
-        }
+        rv.setTextViewText(R.id.ingredient_text_view, ingredient.getFormatedText());
         return rv;
     }
 
