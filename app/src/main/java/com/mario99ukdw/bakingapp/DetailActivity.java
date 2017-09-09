@@ -128,6 +128,7 @@ public class DetailActivity extends AppCompatActivity implements StepListFragmen
     public void OnStepClick(Step step) {
         Log.d(LOG_TAG, "Step clicked " + step.getDescription());
 
+        stepPosition = step.getId();
         if (isMultipane()) {
             loadStepDetail(step);
             Log.d(LOG_TAG, "OnStepClicked multipane " + step.getDescription());
