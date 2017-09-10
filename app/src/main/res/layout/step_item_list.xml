@@ -38,7 +38,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/desc_step_description"
-                android:textSize="20sp"
+                android:textSize="@dimen/step_description_fontSize"
                 tools:text="@string/text_placeholder_description"
                 />
         </LinearLayout>

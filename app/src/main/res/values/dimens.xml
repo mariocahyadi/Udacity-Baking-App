@@ -9,12 +9,15 @@
     <dimen name="list_item_vertical_margin">5dp</dimen>
 
     <dimen name="recipe_list_item_fontSize">20sp</dimen>
+    <dimen name="recipe_list_item_simple_fontSize">30sp</dimen>
+    <dimen name="step_description_fontSize">20sp</dimen>
     <dimen name="recipe_thumbnail_width">80dp</dimen>
     <dimen name="recipe_thumbnail_height">80dp</dimen>
 
     <dimen name="listFontsize">20sp</dimen>
     <dimen name="cardPadding">5dp</dimen>
     <dimen name="elementMargin">5dp</dimen>
+
 
     <!--
 Refer to App Widget Documentation for margin information
