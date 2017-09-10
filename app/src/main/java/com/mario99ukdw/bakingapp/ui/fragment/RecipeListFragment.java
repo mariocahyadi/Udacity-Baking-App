@@ -2,8 +2,6 @@ package com.mario99ukdw.bakingapp.ui.fragment;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,9 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mario99ukdw.bakingapp.DetailActivity;
 import com.mario99ukdw.bakingapp.MainActivity;
@@ -43,7 +39,6 @@ import com.mario99ukdw.bakingapp.schema.json.Recipe;
 import com.mario99ukdw.bakingapp.schema.json.Step;
 import com.mario99ukdw.bakingapp.test.SimpleIdlingResource;
 import com.mario99ukdw.bakingapp.ui.view.RecyclerItemClickListener;
-import com.mario99ukdw.bakingapp.widget.RecipeWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -305,7 +300,8 @@ public class RecipeListFragment extends Fragment implements SwipeRefreshLayout.O
                         saveRecipes(response.body());
                     } else {
                         Log.d(LOG_TAG, "Load recipes from server is not success");
-                        Toast.makeText(getActivity(), R.string.toast_load_data_from_server_failed, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(), R.string.toast_load_data_from_server_failed, Toast.LENGTH_LONG).show();
+                        showSnackbarMessage(getString(R.string.toast_load_data_from_server_failed));
                         loadRecipesFromLocalData();
                     }
                     hideProgressDialog();
@@ -314,14 +310,16 @@ public class RecipeListFragment extends Fragment implements SwipeRefreshLayout.O
                 @Override
                 public void onFailure(Call<List<Recipe>> call, Throwable t) {
                     Log.d(LOG_TAG, "Load recipes from server is failed with message: " + t.getMessage());
-                    Toast.makeText(getActivity(), R.string.toast_load_data_from_server_failed, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getActivity(), R.string.toast_load_data_from_server_failed, Toast.LENGTH_LONG).show();
+                    showSnackbarMessage(getString(R.string.toast_load_data_from_server_failed));
                     loadRecipesFromLocalData();
                     t.printStackTrace();
                     hideProgressDialog();
                 }
             });
         } else {
-            Toast.makeText(getActivity(), R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
+            showSnackbarMessage(getString(R.string.toast_no_connectivity));
             loadRecipesFromLocalData();
         }
     }
@@ -364,6 +362,11 @@ public class RecipeListFragment extends Fragment implements SwipeRefreshLayout.O
 
         mNoDataTextView.setVisibility(recipes.size() == 0 ? View.VISIBLE : View.GONE);
         mContentScrollView.setVisibility(recipes.size() > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    public void showSnackbarMessage(String text) {
+        Snackbar.make(mContentScrollView, text, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 
     @Override
