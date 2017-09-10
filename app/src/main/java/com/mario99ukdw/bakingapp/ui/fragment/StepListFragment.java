@@ -40,18 +40,6 @@ public class StepListFragment extends Fragment {
     private static final String LOG_TAG = RecipeListFragment.class.getSimpleName();
     private static final String STATE_VAR_NAME_SCROLL_Y = "scroll_y";
 
-    public static StepListFragment newInstance(Recipe recipe){
-        StepListFragment fragment = new StepListFragment();
-        Bundle b = new Bundle();
-        b.putParcelable("recipe", recipe);
-        fragment.setArguments(b);
-        return fragment;
-    }
-
-    public interface OnStepClickListener {
-        void OnStepClick(Step step);
-    }
-
     Recipe recipe;
     ArrayList<Ingredient> ingredients;
 
@@ -61,6 +49,18 @@ public class StepListFragment extends Fragment {
     @BindView(R.id.content_scroll_view) ScrollView mContentScrollView;
     @BindView(R.id.no_data_text_view) TextView mNoDataTextView;
     @BindView(R.id.ingredient_text_view) TextView mIngredientTextView;
+
+    public interface OnStepClickListener {
+        void OnStepClick(Step step);
+    }
+
+    public static StepListFragment newInstance(Recipe recipe){
+        StepListFragment fragment = new StepListFragment();
+        Bundle b = new Bundle();
+        b.putParcelable("recipe", recipe);
+        fragment.setArguments(b);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

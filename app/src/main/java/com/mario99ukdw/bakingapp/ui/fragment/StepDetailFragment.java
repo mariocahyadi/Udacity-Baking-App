@@ -48,19 +48,6 @@ public class StepDetailFragment extends Fragment {
     private static final String LOG_TAG = StepDetailFragment.class.getSimpleName();
     public static final String ARGUMENT_VAR_NAME_STEP = "step";
 
-    public static StepDetailFragment newInstance(Step step){
-        StepDetailFragment fragment = new StepDetailFragment();
-        Bundle b = new Bundle();
-        b.putParcelable(ARGUMENT_VAR_NAME_STEP, step);
-        fragment.setArguments(b);
-        return fragment;
-    }
-
-    public interface OnStepDetailClickListener {
-        void OnStepPreviousClick();
-        void OnStepNextClick();
-    }
-
     private Step step;
 
     private DataSource.Factory mediaDataSourceFactory;
@@ -75,6 +62,19 @@ public class StepDetailFragment extends Fragment {
     @BindView(R.id.no_video_text_view) TextView noVideoTextView;
     @Nullable @BindView(R.id.big_image_view) ImageView bigImageView;
     @Nullable @BindView(R.id.thumb_image_view) ImageView thumbImageView;
+
+    public interface OnStepDetailClickListener {
+        void OnStepPreviousClick();
+        void OnStepNextClick();
+    }
+
+    public static StepDetailFragment newInstance(Step step){
+        StepDetailFragment fragment = new StepDetailFragment();
+        Bundle b = new Bundle();
+        b.putParcelable(ARGUMENT_VAR_NAME_STEP, step);
+        fragment.setArguments(b);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
