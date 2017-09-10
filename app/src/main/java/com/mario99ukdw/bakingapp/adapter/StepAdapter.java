@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +63,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
         //step.setThumbnailURL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVwZTCCVWZ06f-2X-N1GsHMlgT9MwD7HuC1T5SoadzJFEA896-UA");
         if (viewHolder.thumbImageView != null && mContext != null) {
-            if (!step.getThumbnailURL().isEmpty()) {
+            if (!TextUtils.isEmpty(step.getThumbnailURL())) {
                 viewHolder.thumbImageView.setVisibility(View.VISIBLE);
                 viewHolder.thumbImageView.setScaleType(ImageView.ScaleType.FIT_XY);
                 Picasso.with(mContext)

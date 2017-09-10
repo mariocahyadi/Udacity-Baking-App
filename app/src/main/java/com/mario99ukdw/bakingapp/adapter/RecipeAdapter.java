@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +63,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         //recipe.setImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVwZTCCVWZ06f-2X-N1GsHMlgT9MwD7HuC1T5SoadzJFEA896-UA");
         if (viewHolder.imageView != null && mContext != null) {
             viewHolder.imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-            if (!recipe.getImage().isEmpty()) {
+            if (!TextUtils.isEmpty(recipe.getImage())) {
                 Picasso.with(mContext)
                         .load(recipe.getImage())
                         .placeholder(R.drawable.no_image_available_md)
