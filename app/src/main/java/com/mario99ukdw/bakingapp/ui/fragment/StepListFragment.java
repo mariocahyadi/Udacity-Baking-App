@@ -2,18 +2,16 @@ package com.mario99ukdw.bakingapp.ui.fragment;
 
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.mario99ukdw.bakingapp.DetailActivity;
@@ -48,7 +46,7 @@ public class StepListFragment extends Fragment {
     OnStepClickListener onStepClickListener;
 
     @BindView(R.id.step_recycler_view) RecyclerView mStepRecyclerView;
-    @BindView(R.id.content_scroll_view) ScrollView mContentScrollView;
+    @BindView(R.id.content_scroll_view) NestedScrollView mContentScrollView;
     @BindView(R.id.no_data_text_view) TextView mNoDataTextView;
     @BindView(R.id.ingredient_text_view) TextView mIngredientTextView;
 

@@ -20,7 +20,7 @@
         android:contentDescription="@string/text_no_data_to_show"
         />
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/content_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -34,9 +34,7 @@
                 android:id="@+id/card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/desc_ingredients"
-                >
-
+                android:contentDescription="@string/desc_ingredients">
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
@@ -65,7 +63,6 @@
                         />
 
                 </LinearLayout>
-
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.RecyclerView
@@ -75,7 +72,8 @@
                 android:layout_marginTop="20dp"
                 android:contentDescription="@string/desc_step_list"
                 />
+
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
 </RelativeLayout>
