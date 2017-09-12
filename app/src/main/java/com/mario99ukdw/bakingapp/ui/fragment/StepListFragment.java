@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.mario99ukdw.bakingapp.DetailActivity;
 import com.mario99ukdw.bakingapp.MainActivity;
 import com.mario99ukdw.bakingapp.R;
 import com.mario99ukdw.bakingapp.adapter.StepAdapter;
@@ -42,6 +43,7 @@ public class StepListFragment extends Fragment {
 
     Recipe recipe;
     ArrayList<Ingredient> ingredients;
+    int stepPosition;
 
     OnStepClickListener onStepClickListener;
 
@@ -55,9 +57,14 @@ public class StepListFragment extends Fragment {
     }
 
     public static StepListFragment newInstance(Recipe recipe){
+        return newInstance(recipe, 0);
+    }
+
+    public static StepListFragment newInstance(Recipe recipe, int stepPosition){
         StepListFragment fragment = new StepListFragment();
         Bundle b = new Bundle();
-        b.putParcelable("recipe", recipe);
+        b.putParcelable(DetailActivity.STATE_VAR_NAME_RECIPE, recipe);
+        b.putInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION, stepPosition);
         fragment.setArguments(b);
         return fragment;
     }
@@ -96,6 +103,8 @@ public class StepListFragment extends Fragment {
         mStepRecyclerView.setLayoutManager(layoutManager);
 
         Recipe recipe = getArguments().getParcelable(MainActivity.EXTRA_VAR_NAME_RECIPE);
+        stepPosition = getArguments().getInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION);
+        if (stepPosition < 0) stepPosition = 0;
 
         loadStepListToRecyclerView(recipe.getSteps());
         loadIngredientsFromLocalData(recipe.getId());
@@ -155,7 +164,7 @@ public class StepListFragment extends Fragment {
         StepAdapter adapter = new StepAdapter(steps, this.getContext());
         mStepRecyclerView.setAdapter(adapter);
 
-        if (isMultipane() && steps.size() > 0) adapter.setSelectedPosition(0);
+        if (isMultipane() && steps.size() > 0) adapter.setSelectedPosition(stepPosition);
 
         mNoDataTextView.setVisibility(steps.size() == 0 ? View.VISIBLE : View.GONE);
         mContentScrollView.setVisibility(steps.size() > 0 ? View.VISIBLE : View.GONE);

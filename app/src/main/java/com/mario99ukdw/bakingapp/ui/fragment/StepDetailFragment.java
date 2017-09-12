@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,11 @@ import butterknife.Optional;
 public class StepDetailFragment extends Fragment {
     private static final String LOG_TAG = StepDetailFragment.class.getSimpleName();
     public static final String ARGUMENT_VAR_NAME_STEP = "step";
+    public static final String ARGUMENT_VAR_NAME_PLAY_WHEN_READY = "play_when_ready";
+    public static final String ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION = "player_last_position";
+
+    private static final String STATE_VAR_NAME_PLAY_WHEN_READY = "play_when_ready";
+    private static final String STATE_VAR_NAME_PLAYER_LAST_POSITION = "player_last_position";
 
     private Step step;
 
@@ -56,7 +62,10 @@ public class StepDetailFragment extends Fragment {
     private DefaultTrackSelector trackSelector;
     private BandwidthMeter bandwidthMeter;
 
-    OnStepDetailClickListener onStepDetailClickListener;
+    private boolean playWhenReady = true;
+    private long playerLastPosition = 0;
+
+    OnStepDetailListener onStepDetailListener;
 
     @Nullable @BindView(R.id.step_description_text_view) TextView stepDescriptionTextView;
     @BindView(R.id.player_view)  SimpleExoPlayerView simpleExoPlayerView;
@@ -64,15 +73,22 @@ public class StepDetailFragment extends Fragment {
     @Nullable @BindView(R.id.big_image_view) ImageView bigImageView;
     @Nullable @BindView(R.id.thumb_image_view) ImageView thumbImageView;
 
-    public interface OnStepDetailClickListener {
+    public interface OnStepDetailListener {
         void OnStepPreviousClick();
         void OnStepNextClick();
+        void onSaveInstanceState(boolean playWhenReady, long playerLastPosition);
     }
 
     public static StepDetailFragment newInstance(Step step){
+        return newInstance(step, true, 0);
+    }
+
+    public static StepDetailFragment newInstance(Step step, boolean playWhenReady, long playerLastPosition){
         StepDetailFragment fragment = new StepDetailFragment();
         Bundle b = new Bundle();
         b.putParcelable(ARGUMENT_VAR_NAME_STEP, step);
+        b.putBoolean(ARGUMENT_VAR_NAME_PLAY_WHEN_READY, playWhenReady);
+        b.putLong(ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION, playerLastPosition);
         fragment.setArguments(b);
         return fragment;
     }
@@ -89,22 +105,51 @@ public class StepDetailFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         step = getArguments().getParcelable(ARGUMENT_VAR_NAME_STEP);
+        playWhenReady = getArguments().getBoolean(ARGUMENT_VAR_NAME_PLAY_WHEN_READY);
+        playerLastPosition = getArguments().getLong(ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION);
 
         refreshUI();
 
         bandwidthMeter = new DefaultBandwidthMeter();
         mediaDataSourceFactory = new DefaultDataSourceFactory(this.getContext(), Util.getUserAgent(this.getContext(), "mediaPlayerSample"), (TransferListener<? super DataSource>) bandwidthMeter);
 
+        Log.d(LOG_TAG, "onCreateView is called");
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (player != null) {
+            playWhenReady = player.getPlayWhenReady();
+            playerLastPosition = player.getCurrentPosition();
+            if (onStepDetailListener != null) onStepDetailListener.onSaveInstanceState(playWhenReady, playerLastPosition);
+        }
+        outState.putBoolean(STATE_VAR_NAME_PLAY_WHEN_READY, playWhenReady);
+        outState.putLong(STATE_VAR_NAME_PLAYER_LAST_POSITION, playerLastPosition);
+
+        Log.d(LOG_TAG, "onSaveInstanceState is called");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            this.playWhenReady = savedInstanceState.getBoolean(STATE_VAR_NAME_PLAY_WHEN_READY, true);
+            this.playerLastPosition = savedInstanceState.getLong(STATE_VAR_NAME_PLAYER_LAST_POSITION, 0);
+        }
+        Log.d(LOG_TAG, "onActivityCreated is called");
     }
 
     @Optional @OnClick(R.id.previous_text_view)
     public void OnPreviousClick() {
-        if (onStepDetailClickListener != null) onStepDetailClickListener.OnStepPreviousClick();
+        if (onStepDetailListener != null) onStepDetailListener.OnStepPreviousClick();
     }
     @Optional @OnClick(R.id.next_text_view)
     public void OnNextClick() {
-        if (onStepDetailClickListener != null) onStepDetailClickListener.OnStepNextClick();
+        if (onStepDetailListener != null) onStepDetailListener.OnStepNextClick();
     }
 
     private Uri getVideoUri() {
@@ -135,7 +180,8 @@ public class StepDetailFragment extends Fragment {
             trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
             player = ExoPlayerFactory.newSimpleInstance(this.getContext(), trackSelector);
             simpleExoPlayerView.setPlayer(player);
-            player.setPlayWhenReady(true);
+            player.seekTo(playerLastPosition);
+            player.setPlayWhenReady(playWhenReady);
 
             DefaultExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
             MediaSource mediaSource = new ExtractorMediaSource(videoUri, mediaDataSourceFactory, extractorsFactory, null, null);
@@ -154,6 +200,12 @@ public class StepDetailFragment extends Fragment {
 
     private void releasePlayer() {
         if (player != null) {
+            playWhenReady = player.getPlayWhenReady();
+            playerLastPosition = player.getCurrentPosition();
+            player.setPlayWhenReady(false);
+
+            if (onStepDetailListener != null) onStepDetailListener.onSaveInstanceState(playWhenReady, playerLastPosition);
+
             player.release();
             player = null;
             trackSelector = null;
@@ -162,9 +214,13 @@ public class StepDetailFragment extends Fragment {
 
     public void loadStep(Step step) {
         this.step = step;
+        Log.d(LOG_TAG, "loadStep is called");
 
         refreshUI();
         releasePlayer();
+
+        playWhenReady = true;
+        playerLastPosition = 0;
         initializePlayer();
     }
 
@@ -174,6 +230,7 @@ public class StepDetailFragment extends Fragment {
         if (Util.SDK_INT > 23) {
             initializePlayerWithDelay();
         }
+        Log.d(LOG_TAG, "onStart is called");
     }
 
     @Override
@@ -182,6 +239,7 @@ public class StepDetailFragment extends Fragment {
         if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayerWithDelay();
         }
+        Log.d(LOG_TAG, "onResume is called");
     }
 
     @Override
@@ -206,7 +264,7 @@ public class StepDetailFragment extends Fragment {
         return isTablet && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
-    public void setOnStepDetailClickListener(OnStepDetailClickListener listener) {
-        onStepDetailClickListener = listener;
+    public void setOnStepDetailListener(OnStepDetailListener listener) {
+        onStepDetailListener = listener;
     }
 }
