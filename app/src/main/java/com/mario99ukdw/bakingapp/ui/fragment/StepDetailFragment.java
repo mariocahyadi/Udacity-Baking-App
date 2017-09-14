@@ -49,9 +49,8 @@ import butterknife.Optional;
 public class StepDetailFragment extends Fragment {
     private static final String LOG_TAG = StepDetailFragment.class.getSimpleName();
     public static final String ARGUMENT_VAR_NAME_STEP = "step";
-    public static final String ARGUMENT_VAR_NAME_PLAY_WHEN_READY = "play_when_ready";
-    public static final String ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION = "player_last_position";
 
+    private static final String STATE_VAR_NAME_STEP = "step";
     private static final String STATE_VAR_NAME_PLAY_WHEN_READY = "play_when_ready";
     private static final String STATE_VAR_NAME_PLAYER_LAST_POSITION = "player_last_position";
 
@@ -64,6 +63,7 @@ public class StepDetailFragment extends Fragment {
 
     private boolean playWhenReady = true;
     private long playerLastPosition = 0;
+    private boolean isVisible = true;
 
     OnStepDetailListener onStepDetailListener;
 
@@ -76,19 +76,12 @@ public class StepDetailFragment extends Fragment {
     public interface OnStepDetailListener {
         void OnStepPreviousClick();
         void OnStepNextClick();
-        void onSaveInstanceState(boolean playWhenReady, long playerLastPosition);
     }
 
     public static StepDetailFragment newInstance(Step step){
-        return newInstance(step, true, 0);
-    }
-
-    public static StepDetailFragment newInstance(Step step, boolean playWhenReady, long playerLastPosition){
         StepDetailFragment fragment = new StepDetailFragment();
         Bundle b = new Bundle();
         b.putParcelable(ARGUMENT_VAR_NAME_STEP, step);
-        b.putBoolean(ARGUMENT_VAR_NAME_PLAY_WHEN_READY, playWhenReady);
-        b.putLong(ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION, playerLastPosition);
         fragment.setArguments(b);
         return fragment;
     }
@@ -104,11 +97,7 @@ public class StepDetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
         ButterKnife.bind(this, view);
 
-        step = getArguments().getParcelable(ARGUMENT_VAR_NAME_STEP);
-        playWhenReady = getArguments().getBoolean(ARGUMENT_VAR_NAME_PLAY_WHEN_READY);
-        playerLastPosition = getArguments().getLong(ARGUMENT_VAR_NAME_PLAYER_LAST_POSITION);
-
-        refreshUI();
+        if (step == null) step = getArguments().getParcelable(ARGUMENT_VAR_NAME_STEP);
 
         bandwidthMeter = new DefaultBandwidthMeter();
         mediaDataSourceFactory = new DefaultDataSourceFactory(this.getContext(), Util.getUserAgent(this.getContext(), "mediaPlayerSample"), (TransferListener<? super DataSource>) bandwidthMeter);
@@ -124,7 +113,6 @@ public class StepDetailFragment extends Fragment {
         if (player != null) {
             playWhenReady = player.getPlayWhenReady();
             playerLastPosition = player.getCurrentPosition();
-            if (onStepDetailListener != null) onStepDetailListener.onSaveInstanceState(playWhenReady, playerLastPosition);
         }
         outState.putBoolean(STATE_VAR_NAME_PLAY_WHEN_READY, playWhenReady);
         outState.putLong(STATE_VAR_NAME_PLAYER_LAST_POSITION, playerLastPosition);
@@ -140,6 +128,9 @@ public class StepDetailFragment extends Fragment {
             this.playWhenReady = savedInstanceState.getBoolean(STATE_VAR_NAME_PLAY_WHEN_READY, true);
             this.playerLastPosition = savedInstanceState.getLong(STATE_VAR_NAME_PLAYER_LAST_POSITION, 0);
         }
+
+        refreshUI();
+
         Log.d(LOG_TAG, "onActivityCreated is called");
     }
 
@@ -204,23 +195,34 @@ public class StepDetailFragment extends Fragment {
             playerLastPosition = player.getCurrentPosition();
             player.setPlayWhenReady(false);
 
-            if (onStepDetailListener != null) onStepDetailListener.onSaveInstanceState(playWhenReady, playerLastPosition);
-
             player.release();
             player = null;
             trackSelector = null;
         }
     }
 
+    public void setStep(Step step) {
+        if (simpleExoPlayerView != null) {
+            loadStep(step, false);
+        } else{
+            this.step = step;
+        }
+    }
     public void loadStep(Step step) {
+        loadStep(step, true);
+    }
+
+    public void loadStep(Step step, boolean resetState) {
         this.step = step;
         Log.d(LOG_TAG, "loadStep is called");
 
         refreshUI();
         releasePlayer();
 
-        playWhenReady = true;
-        playerLastPosition = 0;
+        if (resetState) {
+            playWhenReady = true;
+            playerLastPosition = 0;
+        }
         initializePlayer();
     }
 
@@ -256,12 +258,6 @@ public class StepDetailFragment extends Fragment {
         if (Util.SDK_INT > 23) {
             releasePlayer();
         }
-    }
-
-    private boolean isMultipane() {
-        boolean isTablet = getContext().getResources().getBoolean(R.bool.isTablet);
-
-        return isTablet && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public void setOnStepDetailListener(OnStepDetailListener listener) {

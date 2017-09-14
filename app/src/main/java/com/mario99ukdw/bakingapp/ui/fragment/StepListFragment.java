@@ -41,7 +41,7 @@ public class StepListFragment extends Fragment {
 
     Recipe recipe;
     ArrayList<Ingredient> ingredients;
-    int stepPosition;
+    int stepPosition = 0;
 
     OnStepClickListener onStepClickListener;
 
@@ -55,14 +55,9 @@ public class StepListFragment extends Fragment {
     }
 
     public static StepListFragment newInstance(Recipe recipe){
-        return newInstance(recipe, 0);
-    }
-
-    public static StepListFragment newInstance(Recipe recipe, int stepPosition){
         StepListFragment fragment = new StepListFragment();
         Bundle b = new Bundle();
         b.putParcelable(DetailActivity.STATE_VAR_NAME_RECIPE, recipe);
-        b.putInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION, stepPosition);
         fragment.setArguments(b);
         return fragment;
     }
@@ -78,16 +73,13 @@ public class StepListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_step_list, container, false);
         ButterKnife.bind(this, view);
 
-        if (savedInstanceState != null) {
-            float scroll_y = savedInstanceState.getFloat(STATE_VAR_NAME_SCROLL_Y);
-            mContentScrollView.setY(scroll_y);
-            Log.d(LOG_TAG, "scroll view set Y = " + scroll_y);
-        }
+        Log.d(LOG_TAG, "onCreateView is called");
 
         mStepRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(this.getContext(), mStepRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override public void onItemClick(View view, int position) {
                     if (onStepClickListener != null) {
+                        stepPosition = position;
                         Step step = ((StepAdapter) mStepRecyclerView.getAdapter()).getItem(position);
                         onStepClickListener.OnStepClick(step);
                     }
@@ -101,8 +93,6 @@ public class StepListFragment extends Fragment {
         mStepRecyclerView.setLayoutManager(layoutManager);
 
         Recipe recipe = getArguments().getParcelable(MainActivity.EXTRA_VAR_NAME_RECIPE);
-        stepPosition = getArguments().getInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION);
-        if (stepPosition < 0) stepPosition = 0;
 
         loadStepListToRecyclerView(recipe.getSteps());
         loadIngredientsFromLocalData(recipe.getId());
@@ -114,9 +104,25 @@ public class StepListFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         float scroll_y = mContentScrollView.getY();
         outState.putFloat(STATE_VAR_NAME_SCROLL_Y, scroll_y);
+        //outState.putInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION, stepPosition);
         Log.d(LOG_TAG, "scroll view save Y = " + scroll_y);
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            float scroll_y = savedInstanceState.getFloat(STATE_VAR_NAME_SCROLL_Y);
+            mContentScrollView.setY(scroll_y);
+            Log.d(LOG_TAG, "scroll view set Y = " + scroll_y);
+
+            //stepPosition = savedInstanceState.getInt(DetailActivity.STATE_VAR_NAME_STEP_POSITION, 0);
+            StepAdapter adapter = (StepAdapter) mStepRecyclerView.getAdapter();
+            adapter.setSelectedPosition(stepPosition);
+        }
     }
 
     /**
@@ -170,6 +176,19 @@ public class StepListFragment extends Fragment {
 
     public void setOnStepClickListener(OnStepClickListener listener) {
         onStepClickListener = listener;
+    }
+
+    public void clearStepSelection() {
+        StepAdapter adapter = (StepAdapter) mStepRecyclerView.getAdapter();
+        adapter.setSelectedPosition(RecyclerView.NO_POSITION);
+    }
+
+    public void setStepPosition(int stepPosition) {
+        this.stepPosition = stepPosition;
+        if (mStepRecyclerView != null && mStepRecyclerView.getAdapter() != null) {
+            StepAdapter adapter = (StepAdapter) mStepRecyclerView.getAdapter();
+            adapter.setSelectedPosition(stepPosition);
+        }
     }
 
     private boolean isMultipane() {

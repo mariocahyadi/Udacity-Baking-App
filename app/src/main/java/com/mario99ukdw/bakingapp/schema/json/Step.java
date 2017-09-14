@@ -8,6 +8,16 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Step implements Parcelable {
+    public static Step createEmptyStep() {
+        Step step = new Step();
+        step.setId(-1);
+        step.setThumbnailURL("");
+        step.setVideoURL("");
+        step.setDescription("");
+        step.setShortDescription("");
+
+        return step;
+    }
     public Step() {}
 
     @SerializedName("id")
